@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 
+
 # Files for load and output result
 data_path = os.path.join("Resources", "election_data.csv")
 files_to_output = os.path.join("Analysis", "Results.txt")
