@@ -1,41 +1,52 @@
-import pandas as pd
+##PyPoll Challenge
+
+#Dependencies
 import os
+import csv
 
 
 # Files for load and output result
 data_path = os.path.join("Resources", "election_data.csv")
 files_to_output = os.path.join("Analysis", "Results.txt")
 
-# Read csv into a DataFrame
-election_data = pd.read_csv(data_path)
+# Variables
+total_votes = 0
+candidates = {}
+winner = ""
 
-# Step 2: Calculate the total number of votes cast
-total_votes = len(election_data)
+# Read csv into a list
+with open(data_path, mode='r') as election_data:
+    reader = csv.reader(election_data)
+    header = next(reader)  # Skip the header row
 
-# Step 3: Get a complete list of candidates who received votes
-candidates = election_data["Candidate"].unique()
+    # Count total votes and votes per candidate
+    for row in reader:
+        total_votes += 1
+        candidate = row[2]  # Using number 2 because it actually implies the third column
 
-# Step 4: Calculate the total number of votes each candidate received
-votes_per_candidate = election_data["Candidate"].value_counts()
+        if candidate in candidates:
+            candidates[candidate] += 1
+        else:
+            candidates[candidate] = 1
 
-# Step 5: Calculate the percentage of votes each candidate won
-vote_percentage = (votes_per_candidate / total_votes) * 100
+# Calculate the percentage of votes each candidate recieved 
+vote_percentage = {candidate: (votes / total_votes) * 100 for candidate, votes in candidates.items()}
 
-# Step 6: Determine the winner based on the popular vote
-winner = votes_per_candidate.idxmax()
+# Determine the winner based on the popular vote
+winner = max(candidates, key=candidates.get)
 
-# Step 7: Output the results in a readable format
+# Output the results 
 output = (
     f"Election Results\n"
-    f"-------------------------\n"
     f"Total Votes: {total_votes}\n"
-    f"-------------------------\n"
-)
-for candidate in votes_per_candidate.index:
-    output += f"{candidate}: {vote_percentage[candidate]:.3f}% ({votes_per_candidate[candidate]})\n"
+    f"-------------------------\n")
+
+for candidate, votes in candidates.items():
+    output += f"{candidate}: {vote_percentage[candidate]:.3f}% ({votes})\n"
 
 output += f"-------------------------\n"
 output += f"Winner: {winner}\n"
+output += f"-------------------------\n"
 
 print(output)
 
